@@ -1,0 +1,15 @@
+int x;
+int y;
+int z;
+
+x = 3;
+y = x * 2;
+z = 0;
+
+if (y > 5) {
+    z = y + 10;
+} else {
+    z = 999;
+}
+
+print(z);
