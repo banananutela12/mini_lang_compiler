@@ -1,6 +1,11 @@
-# run_tac.py
+import os
 import sys
-from vm import TACVM
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT)
+
+from src.vm import TACVM
+
 
 def main():
     if len(sys.argv) < 2:

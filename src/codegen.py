@@ -1,6 +1,6 @@
 # codegen.py
 from typing import List, Dict, Tuple
-from ast_nodes import *
+from src.ast_nodes import *
 
 class TACGenerator:
     def __init__(self):

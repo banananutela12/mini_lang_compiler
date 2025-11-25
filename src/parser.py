@@ -1,7 +1,8 @@
+
 # parser.py
 from typing import List
-from lexer import Lexer, Token
-from ast_nodes import *
+from src.lexer import Lexer, Token
+from src.ast_nodes import *
 
 class Parser:
     def __init__(self, text: str):

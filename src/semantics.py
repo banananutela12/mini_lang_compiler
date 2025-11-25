@@ -1,6 +1,6 @@
 # semantics.py
 from typing import Dict
-from ast_nodes import *
+from src. ast_nodes import *
 
 class SemanticError(Exception):
     pass

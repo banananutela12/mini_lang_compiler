@@ -1,6 +1,6 @@
 # vm.py
 from typing import List, Dict
-
+from src.ast_nodes import *
 class TACVM:
     def __init__(self, instructions: List[str]):
         self.instructions = instructions

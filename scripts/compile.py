@@ -1,8 +1,14 @@
 # compile.py
+
 import sys
-from parser import Parser
-from semantics import SemanticAnalyzer, SemanticError
-from codegen import TACGenerator
+import os
+
+# Add project root so Python can find src/
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from src.parser import Parser
+from src.semantics import SemanticAnalyzer, SemanticError
+from src.codegen import TACGenerator
 
 def main():
     if len(sys.argv) < 3:
@@ -18,11 +24,9 @@ def main():
     with open(input_file, "r") as f:
         source = f.read()
 
-    # parse
     parser = Parser(source)
     program = parser.parse()
 
-    # semantic analysis
     sem = SemanticAnalyzer()
     try:
         sem.analyze(program)
@@ -30,15 +34,12 @@ def main():
         print(f"Semantic error: {e}")
         sys.exit(1)
 
-    # codegen
     gen = TACGenerator()
     tac = gen.generate(program)
 
     with open(output_file, "w") as f:
         for instr in tac:
             f.write(instr + "\n")
-
-    print(f"Compiled {input_file} -> {output_file}")
-
 if __name__ == "__main__":
     main()
+
