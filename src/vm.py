@@ -1,16 +1,16 @@
 # vm.py
 from typing import List, Dict
 from src.ast_nodes import *
+
 class TACVM:
     def __init__(self, instructions: List[str]):
         self.instructions = instructions
         self.labels: Dict[str, int] = {}
         self.vars: Dict[str, int] = {}
-        self.pc = 0  # program counter
+        self.pc = 0  
         self._index_labels()
 
     def _index_labels(self):
-        # Map label "L1:" -> instruction index + 1 (next instr)
         idx = 0
         new_instrs = []
         for i, instr in enumerate(self.instructions):
@@ -28,22 +28,16 @@ class TACVM:
             self.pc += 1
             if not instr:
                 continue
-            # print
             if instr.startswith("print "):
                 expr = instr[len("print "):].strip()
                 val = self.eval_expr(expr)
                 print(val)
                 continue
-            # goto
             if instr.startswith("goto "):
                 label = instr[len("goto "):].strip()
                 self.pc = self.labels[label]
                 continue
-            # if cond goto label
             if instr.startswith("if "):
-                # format: if X == 0 goto Lx   OR similar
-                # we'll split: if <cond> goto <label>
-                # we treat cond as expression (before 'goto')
                 parts = instr.split("goto")
                 cond_part = parts[0][len("if "):].strip()
                 label = parts[1].strip()
@@ -51,7 +45,6 @@ class TACVM:
                 if cond_val:
                     self.pc = self.labels[label]
                 continue
-            # assignment: x := expr
             if ":=" in instr:
                 left, right = instr.split(":=")
                 left = left.strip()
@@ -62,13 +55,7 @@ class TACVM:
             raise RuntimeError(f"Unknown instruction: {instr}")
 
     def eval_expr(self, expr: str) -> int:
-        """
-        Evaluator super simple basado en Python eval, pero
-        reemplazando variables por sus valores.
-        OJO: esto es para un proyecto académico pequeño.
-        """
-        # replace variables by values in a safe-ish way
-        # tokens split by space
+        
         tokens = expr.replace("(", " ( ").replace(")", " ) ").split()
         out_tokens = []
         for t in tokens:
@@ -77,16 +64,13 @@ class TACVM:
             else:
                 out_tokens.append(t)
         safe_expr = " ".join(out_tokens)
-        # map logical operators &&, || to Python
         safe_expr = safe_expr.replace("&&", " and ")
         safe_expr = safe_expr.replace("||", " or ")
-        # comparisons and arithmetic are same syntax in Python
-        # treat != 0 as is
+        
         try:
             val = eval(safe_expr, {"__builtins__": {}}, {})
         except Exception as e:
             raise RuntimeError(f"Error evaluating expression '{expr}' as '{safe_expr}': {e}")
-        # convert bools to int 0/1
         if isinstance(val, bool):
             return 1 if val else 0
         return int(val)

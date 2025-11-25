@@ -1,52 +1,48 @@
+# script para correr todos los tests (rapido)
+
 import os
 import subprocess
 
-TESTS_DIR = "tests"
+# root del proyecto
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SRC_DIR = os.path.join(ROOT, "tests")
 
-def run_test(src_file):
-    tac_file = src_file.replace(".src", ".tac")
+def run(cmd):
+    # nota: ejecutar comando y regresar stdout/stderr
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return result.stdout.strip(), result.stderr.strip(), result.returncode
 
-    print(f"\n=== Running {src_file} ===")
+print("\n=== Running All Tests ===")
+print("-------------------------\n")
 
-    # Compile
-    compile_cmd = [
-        "python3",
-        "scripts/compile.py",
-        os.path.join(TESTS_DIR, src_file),
-        "-o",
-        os.path.join(TESTS_DIR, tac_file),
-    ]
-    compile_proc = subprocess.run(compile_cmd, capture_output=True, text=True)
+# recorrer todos los src
+for fname in sorted(os.listdir(SRC_DIR)):
+    if not fname.endswith(".src"):
+        continue
+    
+    print(f"=== Running {fname} ===")
+    
+    src_path = os.path.join(SRC_DIR, fname)
+    out_tac = os.path.join(SRC_DIR, fname.replace(".src", ".tac"))
 
-    if compile_proc.returncode != 0:
-        print(f"[ERROR EXPECTED OR FAIL] {src_file}")
-        print(compile_proc.stdout)
-        print(compile_proc.stderr)
-        return
+    # compilar a tac
+    stdout, stderr, code = run(f"python3 scripts/compile.py {src_path} -o {out_tac}")
 
-    # Run TAC
-    run_cmd = [
-        "python3",
-        "scripts/run_tac.py",
-        os.path.join(TESTS_DIR, tac_file),
-    ]
-    run_proc = subprocess.run(run_cmd, capture_output=True, text=True)
+    if code != 0:
+        print("Compiler error:")
+        print(stdout)
+        print(stderr)
+        print()
+        continue
+    
+    # correr tac
+    stdout, stderr, code = run(f"python3 scripts/run_tac.py {out_tac}")
 
     print("[OUTPUT]")
-    print(run_proc.stdout)
+    if stdout:
+        print(stdout)
+    if stderr:
+        print(stderr)
+    print()
 
-def main():
-    print("=== Running All Tests ===")
-    print("-------------------------")
-
-    files = sorted(
-        [f for f in os.listdir(TESTS_DIR) if f.endswith(".src")]
-    )
-
-    for f in files:
-        run_test(f)
-
-    print("\n=== DONE ===")
-
-if __name__ == "__main__":
-    main()
+print("=== DONE ===")
